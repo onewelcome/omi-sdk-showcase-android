@@ -11,13 +11,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.onewelcome.showcaseapp.ui.screens.HomeScreen
 import com.onewelcome.showcaseapp.ui.screens.InfoScreen
+import com.onewelcome.showcaseapp.ui.screens.sections.SdkInitializationScreen
 
 @Composable
 fun BottomNavigationBar() {
@@ -42,11 +42,10 @@ fun BottomNavigationBar() {
             },
             onClick = {
               navController.navigate(navigationItem.route) {
-                popUpTo(navController.graph.findStartDestination().id) {
+                launchSingleTop = true
+                popUpTo(navController.graph.startDestinationId) {
                   saveState = true
                 }
-                launchSingleTop = true
-                restoreState = true
               }
             }
           )
@@ -56,11 +55,12 @@ fun BottomNavigationBar() {
   ) { paddingValues ->
     NavHost(
       navController = navController,
-      startDestination = Screens.Home.route,
+      startDestination = ScreenNavigation.Home.route,
       modifier = Modifier.padding(paddingValues = paddingValues)
     ) {
-      composable(Screens.Home.route) { HomeScreen(navController) }
-      composable(Screens.Info.route) { InfoScreen(navController) }
+      composable(ScreenNavigation.Home.route) { HomeScreen(navController) }
+      composable(ScreenNavigation.Info.route) { InfoScreen(navController) }
+      composable(ScreenNavigation.SdkInitialization.route) { SdkInitializationScreen(navController) }
     }
   }
 }

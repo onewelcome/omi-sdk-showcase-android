@@ -24,8 +24,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.onewelcome.core.theme.Dimensions
 import com.onewelcome.showcaseapp.R
-import com.onewelcome.showcaseapp.ui.theme.Dimensions
 
 @Composable
 fun SdkFeatureScreen(
@@ -42,7 +42,7 @@ fun SdkFeatureScreen(
     Column(
       modifier = Modifier
         .padding(innerPadding)
-        .padding(start = Dimensions.standardPadding, end = Dimensions.standardPadding),
+        .padding(start = Dimensions.mPadding, end = Dimensions.mPadding),
       verticalArrangement = Arrangement.spacedBy(Dimensions.verticalSpacing)
     ) {
       Column(
@@ -52,7 +52,7 @@ fun SdkFeatureScreen(
         verticalArrangement = Arrangement.spacedBy(Dimensions.verticalSpacing)
       ) {
         Card(modifier = Modifier.fillMaxWidth()) {
-          Box(modifier = Modifier.padding(Dimensions.standardPadding)) {
+          Box(modifier = Modifier.padding(Dimensions.mPadding)) {
             description()
           }
         }
@@ -62,7 +62,7 @@ fun SdkFeatureScreen(
             text = stringResource(R.string.result),
             style = MaterialTheme.typography.titleSmall)
           Card(modifier = Modifier.fillMaxWidth()) {
-            Box(modifier = Modifier.padding(Dimensions.standardPadding)) {
+            Box(modifier = Modifier.padding(Dimensions.mPadding)) {
               result()
             }
           }

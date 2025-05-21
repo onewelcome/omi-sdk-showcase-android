@@ -16,8 +16,11 @@ import com.onegini.mobile.sdk.android.model.entity.UserProfile
 import com.onewelcome.core.usecase.BrowserRegistrationUseCase
 import com.onewelcome.core.usecase.GetUserProfilesUseCase
 import com.onewelcome.core.usecase.IsSdkInitializedUseCase
+import com.onewelcome.core.usecase.PinUseCase
 import com.onewelcome.core.util.Constants
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -25,10 +28,14 @@ import javax.inject.Inject
 class BrowserRegistrationViewModel @Inject constructor(
   isSdkInitializedUseCase: IsSdkInitializedUseCase,
   private val browserRegistrationUseCase: BrowserRegistrationUseCase,
-  private val getUserProfilesUseCase: GetUserProfilesUseCase
+  private val getUserProfilesUseCase: GetUserProfilesUseCase,
+  private val pinUseCase: PinUseCase
 ) : ViewModel() {
   var uiState by mutableStateOf(State())
     private set
+
+  private val _navigationEvents = Channel<NavigationEvent>(Channel.BUFFERED)
+  val navigationEvents = _navigationEvents.receiveAsFlow()
 
   init {
     viewModelScope.launch {
@@ -42,7 +49,7 @@ class BrowserRegistrationViewModel @Inject constructor(
 
   fun onEvent(event: UiEvent) {
     when (event) {
-      is UiEvent.StartBrowserRegistration -> register()
+      is UiEvent.StartBrowserRegistration -> startRegistration()
       is UiEvent.UpdateSelectedIdentityProvider -> uiState = uiState.copy(selectedIdentityProvider = event.identityProvider)
       is UiEvent.UpdateSelectedScopes -> uiState = uiState.copy(selectedScopes = event.scopes)
       is UiEvent.CancelRegistration -> cancelRegistration()
@@ -79,7 +86,20 @@ class BrowserRegistrationViewModel @Inject constructor(
     }
   }
 
-  private fun register() {
+  private fun startRegistration() {
+    registerUser()
+    listenForPinScreenNavigationEvent()
+  }
+
+  private fun listenForPinScreenNavigationEvent() {
+    viewModelScope.launch {
+      pinUseCase.startPinCreationFlow.collect {
+        _navigationEvents.send(NavigationEvent.ToPinScreen)
+      }
+    }
+  }
+
+  private fun registerUser() {
     viewModelScope.launch {
       uiState = uiState.copy(isRegistrationCancellationEnabled = true)
       browserRegistrationUseCase
@@ -112,5 +132,9 @@ class BrowserRegistrationViewModel @Inject constructor(
     data class UpdateSelectedIdentityProvider(val identityProvider: OneginiIdentityProvider) : UiEvent
     data class UpdateSelectedScopes(val scopes: List<String>) : UiEvent
     data class UseDefaultIdentityProvider(val isChecked: Boolean) : UiEvent
+  }
+
+  sealed class NavigationEvent {
+    object ToPinScreen : NavigationEvent()
   }
 }

@@ -1,4 +1,4 @@
-package com.onewelcome.showcaseapp.ui.screens
+package com.onewelcome.showcaseapp.feature.home
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -21,10 +21,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
+import com.onewelcome.core.components.ShowcaseCard
 import com.onewelcome.core.theme.Dimensions
 import com.onewelcome.showcaseapp.R
-import com.onewelcome.showcaseapp.navigation.ScreenNavigation
-import com.onewelcome.showcaseapp.ui.screens.sections.SectionItem
+import com.onewelcome.showcaseapp.navigation.Screens
 
 @Composable
 fun HomeScreen(homeNavController: NavController) {
@@ -33,7 +33,11 @@ fun HomeScreen(homeNavController: NavController) {
 
 @Composable
 fun HomeScreenContent(onNavigateToSection: (route: String) -> Unit) {
-  Column(modifier = Modifier.fillMaxSize()) {
+  Column(
+    modifier = Modifier
+      .fillMaxSize()
+      .padding(start = Dimensions.mPadding, end = Dimensions.mPadding)
+  ) {
     Image(
       modifier = Modifier.fillMaxWidth(),
       painter = painterResource(id = R.drawable.thales_logo),
@@ -46,7 +50,7 @@ fun HomeScreenContent(onNavigateToSection: (route: String) -> Unit) {
 @Composable
 private fun Sections(onNavigateToSection: (route: String) -> Unit) {
   getSections().forEach { section ->
-    Section(section, onNavigateToSection)
+    ShowcaseCard(section.title, section.navigation.route, onNavigateToSection)
   }
 }
 
@@ -54,7 +58,8 @@ private fun Sections(onNavigateToSection: (route: String) -> Unit) {
 @ReadOnlyComposable
 private fun getSections(): List<SectionItem> {
   return listOf(
-    SectionItem(stringResource(R.string.section_title_sdk_initialization), ScreenNavigation.SdkInitialization)
+    SectionItem(stringResource(R.string.section_title_sdk_initialization), Screens.SdkInitialization),
+    SectionItem(stringResource(R.string.section_title_user_registration), Screens.UserRegistration)
   )
 }
 
@@ -63,8 +68,7 @@ private fun getSections(): List<SectionItem> {
 private fun Section(section: SectionItem, onNavigateToSection: (route: String) -> Unit) {
   Card(
     modifier = Modifier
-      .fillMaxWidth()
-      .padding(Dimensions.mPadding),
+      .fillMaxWidth(),
     onClick = {
       onNavigateToSection.invoke(section.navigation.route)
     }
